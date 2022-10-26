@@ -6,23 +6,20 @@ const TAG_SCRIPT_FILE: &str = "-f";
 
 pub struct ParsedArgs {
     pub execution_path: String,
+    pub script_file: String,
     pub in_file: Option<String>,
     pub out_file: Option<String>,
-    pub script_file: Option<String>,
 }
 
 pub fn parse(args: Vec<String>) -> ParsedArgs {
-    let path = args.get(0).expect(
+    let execution_path = args.get(0).expect(
         "Argument parser received a vector without any arguments. There should always be at \
         least one argument, that being the path to this executable."
     ).clone();
 
-    let mut parsed: ParsedArgs = ParsedArgs {
-        execution_path: path,
-        in_file: None,
-        out_file: None,
-        script_file: None,
-    };
+    let mut script_file: Option<String> = None;
+    let mut in_file: Option<String> = None;
+    let mut out_file: Option<String> = None;
 
     let mut i = 1;
     loop {
@@ -33,25 +30,25 @@ pub fn parse(args: Vec<String>) -> ParsedArgs {
 
         match tag {
             TAG_IN_FILE => {
-                if parsed.in_file != None { exit_duplicate_arg(tag) };
+                if in_file != None { exit_duplicate_arg(tag) };
                 match args.get(i + 1) {
-                    Some(value) => parsed.in_file = Some(value.clone()),
+                    Some(value) => in_file = Some(value.clone()),
                     None => exit_empty_arg(tag)
                 }
                 i += 2
             }
             TAG_OUT_FILE => {
-                if parsed.out_file != None { exit_duplicate_arg(tag) };
+                if out_file != None { exit_duplicate_arg(tag) };
                 match args.get(i + 1) {
-                    Some(value) => parsed.out_file = Some(value.clone()),
+                    Some(value) => out_file = Some(value.clone()),
                     None => exit_empty_arg(tag)
                 }
                 i += 2
             }
             TAG_SCRIPT_FILE => {
-                if parsed.script_file != None { exit_duplicate_arg(tag) };
+                if script_file != None { exit_duplicate_arg(tag) };
                 match args.get(i + 1) {
-                    Some(value) => parsed.script_file = Some(value.clone()),
+                    Some(value) => script_file = Some(value.clone()),
                     None => exit_empty_arg(tag)
                 }
                 i += 2
@@ -60,7 +57,12 @@ pub fn parse(args: Vec<String>) -> ParsedArgs {
         }
     }
 
-    return parsed;
+    return ParsedArgs {
+        execution_path,
+        in_file,
+        out_file,
+        script_file: script_file.expect("Script file not set."),
+    };
 }
 
 fn exit_nonexistent_arg(arg: &str) {
