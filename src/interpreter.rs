@@ -1,12 +1,6 @@
-pub trait Input {
-    fn get(&self) -> char;
-}
+use crate::io::{Input, Output};
 
-pub trait Output {
-    fn put(&self, c: char) -> ();
-}
-
-pub fn interpret<>(script: &[char], input: &impl Input, output: &impl Output) {
+pub fn interpret(script: &[char], input: &mut Input, output: &mut Output) {
     let mut data: [u8; DATA_LENGTH] = [0; DATA_LENGTH];
     let mut data_ptr: usize = 0;
     let mut script_ptr: usize = 0;

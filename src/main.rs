@@ -10,15 +10,15 @@ fn main() {
 
     let script = io::file_to_chars(options.script_file.as_str());
 
-    let input = match options.in_file {
-        None => io::input_from_stdin(),
-        Some(val) => io::input_from_file(val.as_str()),
+    let mut input = match options.in_file {
+        None => io::Input::stdin(),
+        Some(val) => io::Input::file(val.as_str()),
     };
 
-    let output = match options.out_file {
-        None => io::output_to_stdout(),
-        Some(val) => io::output_to_file(val.as_str()),
+    let mut output = match options.out_file {
+        None => io::Output::stdout(),
+        Some(val) => io::Output::file(val.as_str()),
     };
 
-    interpreter::interpret(&*script, input, output);
+    interpreter::interpret(&*script, &mut input, &mut output);
 }
