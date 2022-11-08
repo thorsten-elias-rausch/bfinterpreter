@@ -21,10 +21,44 @@ pub fn interpret(script: &[char], input: &mut Input, output: &mut Output) {
             Token::Prev => data_ptr -= 1,
             Token::PutC => output.put(data[data_ptr] as char),
             Token::GetC => data[data_ptr] = input.get() as u8,
-            Token::JmpF => { todo!() }
-            Token::JmpB => { todo!() }
+            Token::JmpF => jump_forward(script, &mut data, &mut data_ptr, &mut script_ptr),
+            Token::JmpB => jump_back(script, &mut data, &mut data_ptr, &mut script_ptr),
         }
         script_ptr += 1;
+    }
+}
+
+fn jump_forward(script: &[char], data: &mut [u8; DATA_LENGTH], data_ptr: &mut usize, script_ptr: &mut usize) {
+    if data[*data_ptr] != 0 { return; }
+    let mut depth = 0;
+    loop {
+        let token = Token::from(*script.get(*script_ptr).expect("Unmatched forward jump."));
+        match token {
+            Token::JmpF => depth += 1,
+            Token::JmpB => {
+                depth -= 1;
+                if depth == 0 { return; }
+            }
+            _ => {}
+        }
+        *script_ptr += 1;
+    }
+}
+
+fn jump_back(script: &[char], data: &mut [u8; DATA_LENGTH], data_ptr: &mut usize, script_ptr: &mut usize) {
+    if data[*data_ptr] == 0 { return; }
+    let mut depth = 0;
+    loop {
+        let token = Token::from(*script.get(*script_ptr).expect("Unmatched back jump."));
+        match token {
+            Token::JmpB => depth += 1,
+            Token::JmpF => {
+                depth -= 1;
+                if depth == 0 { return; }
+            }
+            _ => {}
+        }
+        *script_ptr -= 1;
     }
 }
 
