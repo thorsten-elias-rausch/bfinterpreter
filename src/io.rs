@@ -126,7 +126,7 @@ impl OutputToFile {
     }
 
     fn put(&mut self, c: char) -> () {
-        let buffer = &mut [];
+        let buffer = &mut [4];
         c.encode_utf8(buffer);
         self.file.write(buffer).expect("Failed to write to file");
     }
